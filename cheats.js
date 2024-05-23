@@ -339,7 +339,7 @@ ig.module("cheats").requires("game.feature.player.player-level", "game.feature.p
 			var b = this.coll;
 			b = ig.getDirectionIndex(b.accelDir.x, b.accelDir.y, 8);
 			b = ig.getDirectionVel(b, 8, direction_vec);
-			e = ig.game.physics.initTraceResult(unknown_init_trace_result_global_var);
+			var e = ig.game.physics.initTraceResult(unknown_init_trace_result_global_var);
 			if (!ig.game.traceEntity(e, this, b.x, b.y, 0, 0, 0, ig.COLLTYPE.IGNORE))
 				return false;
 			e = ig.game.physics.initTraceResult(unknown_init_trace_result_global_var);
