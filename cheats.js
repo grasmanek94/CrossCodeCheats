@@ -2,10 +2,10 @@
 (() => {
 	const CHEAT_CONFIG = [
 		["xpcheat",                 {defaultValue: false, type: "CHECKBOX"}],
-		["xpmultiplier",            {defaultValue: 10,   type: "SLIDER", min: 0, max: 100,  requires: ["xpcheat"]}],
-		["xpmingain",               {defaultValue: 1,    type: "SLIDER", min: 0, max: 1000, requires: ["xpcheat"]}],
+		["xpmultiplier",            {defaultValue: 10,   type: "SLIDER", min: 0, max: 1000000,  requires: ["xpcheat"]}],
+		["xpmingain",               {defaultValue: 1,    type: "SLIDER", min: 0, max: 1000000, requires: ["xpcheat"]}],
 		["creditcheat",             {defaultValue: false, type: "CHECKBOX"}],
-		["creditmultiplier",        {defaultValue: 10,   type: "SLIDER", min: 0, max: 100,  requires: ["creditcheat"]}],
+		["creditmultiplier",        {defaultValue: 10,   type: "SLIDER", min: 0, max: 1000000,  requires: ["creditcheat"]}],
 		["donotremovecredit",       {defaultValue: false, type: "CHECKBOX"}],
 		["donotremovearenacoins",   {defaultValue: false, type: "CHECKBOX"}],
 		["arenaalwaysbonuses",      {defaultValue: false, type: "CHECKBOX"}],
@@ -27,7 +27,7 @@
 		["jumphigher",              {defaultValue: false, type: "CHECKBOX"}],
 		["jumphighermodifier",      {defaultValue: 5,    type: "SLIDER", min: 1,  max: 10,  requires: ["jumphigher"]}],
 		["jumpfurther",             {defaultValue: 10,   type: "SLIDER", min: 10, max: 40,  requires: ["jumphigher"]}],
-		["skipintro",               {defaultValue: false, type: "CHECKBOX"}],
+		["skipintro",               {defaultValue: true, type: "CHECKBOX"}],
 		["unlimiteddashes",         {defaultValue: false, type: "CHECKBOX"}],
 		["runspeed",                {defaultValue: false, type: "CHECKBOX"}],
 		["runspeedmultiplier",      {defaultValue: 10,   type: "SLIDER", min: 1,  max: 100, requires: ["runspeed"]}],
@@ -419,6 +419,61 @@ ig.module("cheats").requires("game.feature.player.player-level", "game.feature.p
 				return null;
 			}
 			return this.parent(...args);
+		},
+	});
+
+	sc.BallInfo.inject({
+		spawn(x, y, z, combatant, direction) {
+			console.log("[Compressed Balls] Spawn Called");
+
+			var root =
+				combatant && combatant.getCombatantRoot
+					? combatant.getCombatantRoot()
+					: combatant;
+
+			var isPlayer =
+				combatant === ig.game.playerEntity ||
+				root === ig.game.playerEntity ||
+				(root && root.isPlayer);
+
+			if (
+				!isPlayer ||
+				!ig.input.state("circle-left")
+			) {
+				return this.parent(x, y, z, combatant, direction);
+			}
+
+			var element = sc.combat.getElementMode(root);
+
+			let CompressedEntity;
+
+			switch (element) {
+				case sc.ELEMENT.WAVE:
+					CompressedEntity = sc.CompressedWaveEntity;
+					break;
+
+				case sc.ELEMENT.SHOCK:
+					CompressedEntity = sc.CompressedShockEntity;
+					break;
+
+				default:
+					return this.parent(x, y, z, combatant, direction);
+			}
+
+			var compressedBall = ig.game.spawnEntity(
+				CompressedEntity,
+				x,
+				y,
+				z,
+				{
+					speed: 1,
+					fastMode: false,
+				}
+			);
+
+			compressedBall.shoot(direction, combatant, false);
+
+			return compressedBall;
 		},
 	});
 	// END: Cheats
