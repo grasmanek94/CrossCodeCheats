@@ -34,6 +34,7 @@
 		["maxresistance",           {defaultValue: false, type: "CHECKBOX"}],
 		["instantaim",              {defaultValue: false, type: "CHECKBOX"}],
 		["dontresetpuzzles",        {defaultValue: false, type: "CHECKBOX"}],
+		["puzzleshotsupgrade",      {defaultValue: false, type: "CHECKBOX"}],
 ];
 
 const CHEAT_CONFIG_MAP = new Map(CHEAT_CONFIG);
@@ -424,8 +425,6 @@ ig.module("cheats").requires("game.feature.player.player-level", "game.feature.p
 
 	sc.BallInfo.inject({
 		spawn(x, y, z, combatant, direction) {
-			console.log("[Compressed Balls] Spawn Called");
-
 			var root =
 				combatant && combatant.getCombatantRoot
 					? combatant.getCombatantRoot()
@@ -438,7 +437,8 @@ ig.module("cheats").requires("game.feature.player.player-level", "game.feature.p
 
 			if (
 				!isPlayer ||
-				!ig.input.state("circle-left")
+				!ig.input.state("circle-left") ||
+				!getCheatValue("puzzleshotsupgrade")
 			) {
 				return this.parent(x, y, z, combatant, direction);
 			}
@@ -519,7 +519,8 @@ ig.module("cheats-gui").requires("game.feature.gui.screen.title-screen", "game.f
 					"runspeedmultiplier": "Running Multiplier (10 = 1.0)",
 					"maxresistance": "100% Element Resistances",
 					"instantaim": "Instant Aim",
-					"dontresetpuzzles": "Do Not Reset Puzzle Elements on Misfire"
+					"dontresetpuzzles": "Do Not Reset Puzzle Elements on Misfire",
+					"puzzleshotsupgrade": "Hold Q to create compressed Puzzle Balls"
 				}
 			}
 		}
