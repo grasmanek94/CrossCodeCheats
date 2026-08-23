@@ -35,6 +35,7 @@
 		["instantaim",              {defaultValue: false, type: "CHECKBOX"}],
 		["dontresetpuzzles",        {defaultValue: false, type: "CHECKBOX"}],
 		["puzzleshotsupgrade",      {defaultValue: false, type: "CHECKBOX"}],
+		["enablenoclip",            {defaultValue: false, type: "CHECKBOX"}],
 ];
 
 const CHEAT_CONFIG_MAP = new Map(CHEAT_CONFIG);
@@ -475,6 +476,41 @@ ig.module("cheats").requires("game.feature.player.player-level", "game.feature.p
 
 			return compressedBall;
 		},
+	});
+
+	var noclipEnabled = false;
+	var originalIgnoreCollision = false;
+	var noclipComboWasHeld = false;
+
+	ig.ENTITY.Player.inject({
+		update: function () {
+			var shiftHeld = !!ig.input.state("quick");
+			var nHeld = !!ig.input.state("help3");
+
+			var comboHeld = shiftHeld && nHeld;
+
+			/*
+			* Toggle only when the combination changes from:
+			*
+			* not held -> held
+			*
+			* This avoids toggling every frame.
+			*/
+			if (comboHeld && !noclipComboWasHeld) {
+				noclipEnabled = !noclipEnabled;
+
+				console.log(
+					"[Cheats] Noclip:",
+					noclipEnabled ? "enabled" : "disabled"
+				);
+			}
+
+			noclipComboWasHeld = comboHeld;
+
+			this.setSlipThrough(noclipEnabled);
+
+			return this.parent();
+		}
 	});
 	// END: Cheats
 });
